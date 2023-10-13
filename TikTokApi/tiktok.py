@@ -367,7 +367,7 @@ class TikTokApi:
         url: str,
         headers: dict = None,
         params: dict = None,
-        retries: int = 3,
+        retries: int = 5,
         exponential_backoff: bool = True,
         **kwargs,
     ):
@@ -423,10 +423,16 @@ class TikTokApi:
             )
 
             if result is None:
-                raise Exception("TikTokApi.run_fetch_script returned None")
+                if i == (retries - 1):
+                    raise Exception("TikTokApi.run_fetch_script returned None")
+                else:
+                    continue
 
             if result == "":
-                raise EmptyResponseException()
+                if i == (retries - 1):
+                    raise EmptyResponseException()
+                else:
+                    continue
 
             try:
                 data = json.loads(result)
